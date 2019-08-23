@@ -66,6 +66,10 @@ extension MoviesViewController: UICollectionViewDataSource {
         let cell = self.collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! MovieCollectionViewCell
         self.viewModel.setMovieInformation(on: cell, with: indexPath)
         
+        if indexPath.row == self.viewModel.moviesCount - 1 {
+            self.viewModel.getPopularMovies()
+        }
+        
         return cell
     }
 }

@@ -30,7 +30,8 @@ extension NetworkDelegate {
 class Network {
     
     let kAPIKey = "b2458d509e2728114cff394647cc7ff9"
-    let kBaseURL = "https://api.themoviedb.org/3/movie/"
+    let kMovieBaseURL = "https://api.themoviedb.org/3/movie/"
+    let kDiscoverBaseURL = "https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc"
     
     let delegate: NetworkDelegate
     
@@ -38,8 +39,8 @@ class Network {
         self.delegate = delegate
     }
     
-    func getPopularMovies() {
-        let urlString = "\(kBaseURL)popular?api_key=\(kAPIKey)"
+    func getPopularMovies(page: Int) {
+        let urlString = "\(kDiscoverBaseURL)&api_key=\(kAPIKey)&page=\(page)"
         guard let url = URL(string: urlString) else { return }
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
         let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
@@ -59,7 +60,7 @@ class Network {
     }
     
     func getMovieDetails(_ movieId: Int) {
-        let urlString = "\(kBaseURL)\(movieId)?api_key=\(kAPIKey)"
+        let urlString = "\(kMovieBaseURL)\(movieId)?api_key=\(kAPIKey)"
         guard let url = URL(string: urlString) else { return }
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
         let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
@@ -79,7 +80,7 @@ class Network {
     }
     
     func getMovieCredits(_ movieId: Int) {
-        let urlString = "\(kBaseURL)\(movieId)/credits?api_key=\(kAPIKey)"
+        let urlString = "\(kMovieBaseURL)\(movieId)/credits?api_key=\(kAPIKey)"
         guard let url = URL(string: urlString) else { return }
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
         let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in

@@ -23,6 +23,7 @@ class MoviesViewModel {
     private var movies: [Movie]!
     private var allMovies: [Movie]!
     private var isFilteringUpcomingMovies = false
+    private var page = 0;
     
     var selectedMovieIndex: Int!
     var moviesCount: Int {
@@ -42,7 +43,8 @@ class MoviesViewModel {
     }
     
     func getPopularMovies() {
-        self.network.getPopularMovies()
+        page += 1
+        self.network.getPopularMovies(page: page)
     }
     
     func setMovieInformation(on cell: MovieCollectionViewCell, with indexPath: IndexPath) {
