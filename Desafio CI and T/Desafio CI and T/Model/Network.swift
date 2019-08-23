@@ -15,6 +15,8 @@ protocol NetworkDelegate {
     func didFailGettingMovieDetails(_ error: Error?)
     func didFinishGettingMovieCredits(_ dictionary: [String: Any])
     func didFailGettingMovieCredits(_ error: Error?)
+    func didFinishSearchingMovies(_ dictionary: [String: Any])
+    func didFailSearchingMovies(_ error: Error?)
 }
 
 // Forcing protocol methods to be optional
@@ -25,6 +27,8 @@ extension NetworkDelegate {
     func didFailGettingMovieDetails(_ error: Error?) {}
     func didFinishGettingMovieCredits(_ dictionary: [String: Any]) {}
     func didFailGettingMovieCredits(_ error: Error?) {}
+    func didFinishSearchingMovies(_ dictionary: [String: Any]) {}
+    func didFailSearchingMovies(_ error: Error?) {}
 }
 
 class Network {
@@ -32,6 +36,7 @@ class Network {
     let kAPIKey = "b2458d509e2728114cff394647cc7ff9"
     let kMovieBaseURL = "https://api.themoviedb.org/3/movie/"
     let kDiscoverBaseURL = "https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc"
+    let kSearchBaseURL = "https://api.themoviedb.org/3/search/movie"
     
     let delegate: NetworkDelegate
     
@@ -94,6 +99,26 @@ class Network {
                 }
             } else {
                 self.delegate.didFailGettingMovieCredits(error!)
+            }
+        }
+        dataTask.resume()
+    }
+    
+    func searchMovies(query: String, page: Int) {
+        let urlString = "\(kSearchBaseURL)?api_key=\(kAPIKey)&query=\(query)&page=\(page)"
+        guard let url = URL(string: urlString) else { return }
+        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
+        let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if error == nil {
+                do {
+                    guard let data = data else { return }
+                    guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else { return }
+                    self.delegate.didFinishSearchingMovies(json)
+                } catch {
+                    self.delegate.didFailSearchingMovies(nil)
+                }
+            } else {
+                self.delegate.didFailSearchingMovies(error!)
             }
         }
         dataTask.resume()

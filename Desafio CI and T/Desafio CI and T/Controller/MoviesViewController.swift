@@ -14,6 +14,7 @@ class MoviesViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var loadingView: UIView!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     var viewModel: MoviesViewModel!
     
@@ -21,11 +22,6 @@ class MoviesViewController: UIViewController {
         super.viewDidLoad()
 
         self.viewModel = MoviesViewModel(delegate: self)
-    }
-    
-    @IBAction func upcomingMoviesSwitchValueChanged(_ sender: Any) {
-        self.viewModel.toggleUpcomingMoviesFilter()
-        self.collectionView.reloadData()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -51,6 +47,23 @@ extension MoviesViewController: MoviesViewModelDelegate {
             })
         }
     }
+    
+    func didFinishSearchingMovies(_ viewModel: MoviesViewModel, dictionary: [String : Any]) {
+        DispatchQueue.main.async {
+            self.loadingView.isHidden = true
+            self.collectionView.reloadData()
+        }
+    }
+    
+    func didFailSearchingMovies(_ viewModel: MoviesViewModel, error: Error?) {
+        DispatchQueue.main.async {
+            self.loadingView.isHidden = true
+            self.presentTryAgainAlert(with: "An error occurred when loading the movies", and: {
+                self.viewModel.resetPage()
+                self.viewModel.searchMovies(query: self.searchBar.text!)
+            })
+        }
+    }
 }
 
 extension MoviesViewController: UICollectionViewDataSource {
@@ -67,7 +80,11 @@ extension MoviesViewController: UICollectionViewDataSource {
         self.viewModel.setMovieInformation(on: cell, with: indexPath)
         
         if indexPath.row == self.viewModel.moviesCount - 1 {
-            self.viewModel.getPopularMovies()
+            if self.viewModel.isSearchingMovies {
+                self.viewModel.searchMovies(query: self.searchBar.text!)
+            } else {
+                self.viewModel.getPopularMovies()
+            }
         }
         
         return cell
@@ -79,6 +96,25 @@ extension MoviesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.viewModel.selectedMovieIndex = indexPath.row
         self.performSegue(withIdentifier: "MovieDetailsSegue", sender: self)
+    }
+    
+}
+
+extension MoviesViewController: UISearchBarDelegate {
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        self.searchBar.text = ""
+        self.searchBar.resignFirstResponder()
+        self.viewModel.resetPage()
+        self.viewModel.getPopularMovies()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        if let query = searchBar.text {
+            self.viewModel.resetPage()
+            self.viewModel.searchMovies(query: query)
+            self.searchBar.resignFirstResponder()
+        }
     }
     
 }

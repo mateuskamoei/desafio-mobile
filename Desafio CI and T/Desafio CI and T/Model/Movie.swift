@@ -41,13 +41,13 @@ class Movie {
     init(_ dictionary: [String: Any]) {
         self.id = dictionary[kIdKey] as! Int
         self.title = dictionary[kTitleKey] as! String
-        self.posterPath = dictionary[kPosterPathKey] as! String
+        self.posterPath = dictionary[kPosterPathKey] as? String ?? ""
         
         let releaseDateString = dictionary[kReleaseDateKey] as! String
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
-        self.releaseDate = dateFormatter.date(from:releaseDateString)!
+        self.releaseDate = dateFormatter.date(from:releaseDateString) ?? Date()
         
         if let backdropPath = dictionary[kBackdropPathKey] as? String {
             self.backdropPath = backdropPath
