@@ -31,18 +31,6 @@ class Desafio_CI_TUITests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
     
-    func testFilterUpcomingMovies() {
-        let app = XCUIApplication()
-        
-        expectation(for: NSPredicate(format: "count > 0"), evaluatedWith: app.collectionViews.cells, handler: nil)
-        waitForExpectations(timeout: 3, handler: nil)
-        
-        let firstCellsCount = app.collectionViews.cells.count
-        app.switches.firstMatch.tap()
-        let secondCellsCount = app.collectionViews.cells.count
-        XCTAssertNotEqual(firstCellsCount, secondCellsCount)
-    }
-    
     func testMovieDetailsElements() {
         let app = XCUIApplication()
         
