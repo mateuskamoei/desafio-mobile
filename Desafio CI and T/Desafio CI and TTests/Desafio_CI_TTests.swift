@@ -23,7 +23,6 @@ class Desafio_CI_TTests: XCTestCase {
     var movieDetailsExpectation: XCTestExpectation?
     var movieCreditsExpectation: XCTestExpectation?
     var moviesParsingExpectation: XCTestExpectation?
-    var moviesFilterExpectation: XCTestExpectation?
     
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -38,7 +37,7 @@ class Desafio_CI_TTests: XCTestCase {
 
     func testGetPopularMoviesSuccessReturnMovies() {
         moviesExpectation = expectation(description: "movies")
-        network.getPopularMovies()
+        network.getPopularMovies(page: 1)
         waitForExpectations(timeout: 10) { (error) in
             XCTAssertNotNil(self.moviesJson)
         }
@@ -58,12 +57,6 @@ class Desafio_CI_TTests: XCTestCase {
         waitForExpectations(timeout: 10) { (error) in
             XCTAssertNotNil(self.movieCreditsJson)
         }
-    }
-    
-    func testUpcomingMoviesFilter() {
-        moviesFilterExpectation = expectation(description: "moviesFilter")
-        moviesViewModel.getPopularMovies()
-        waitForExpectations(timeout: 10, handler: nil)
     }
 }
 
@@ -103,16 +96,18 @@ extension Desafio_CI_TTests: NetworkDelegate {
 
 extension Desafio_CI_TTests: MoviesViewModelDelegate {
     func didFinishGettingPopularMovies(_ viewModel: MoviesViewModel, dictionary: [String : Any]) {
-        if let moviesFilterExpectation = self.moviesFilterExpectation {
-            let moviesCount = viewModel.moviesCount
-            viewModel.toggleUpcomingMoviesFilter()
-            let filteredMoviesCount = viewModel.moviesCount
-            XCTAssertNotEqual(moviesCount, filteredMoviesCount)
-            moviesFilterExpectation.fulfill()
-        }
+        
     }
     
     func didFailGettingPopularMovies(_ viewModel: MoviesViewModel, error: Error?) {
+        
+    }
+    
+    func didFinishSearchingMovies(_ viewModel: MoviesViewModel, dictionary: [String : Any]) {
+        
+    }
+    
+    func didFailSearchingMovies(_ viewModel: MoviesViewModel, error: Error?) {
         
     }
 }
